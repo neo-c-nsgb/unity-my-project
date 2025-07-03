@@ -500,7 +500,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 916aa121b61c4c743bf44d1fd39e07ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelDifficulty: 2
+  levelDifficulty: 1
   levelConfigs:
   - difficulty: 1
     gridWidth: 8
