@@ -1,0 +1,3 @@
+monsterId,monsterName,maxHP,damage,damageType,dodgeChance,critChance,critDamageBonus,prefabPath,difficulty
+goblin,Goblin,50,10,Melee,0.1,0.05,0.5,Prefabs/Goblin,1
+drake,Drake,20,20,Ranged,0.2,0.15,1,Prefabs/Drake,2

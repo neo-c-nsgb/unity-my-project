@@ -1,7 +1,6 @@
 // Assets/Scripts/HeroAttributeData.cs
 using UnityEngine;
 
-public enum DamageType { Melee, Ranged }
 
 [CreateAssetMenu(fileName = "HeroAttributes_", menuName = "Heroes/Hero Attribute Data")]
 public class HeroAttributeData : ScriptableObject
