@@ -27,6 +27,20 @@ public class HeroAttributeData : ScriptableObject
     public int moveSpeed;         // columns per turn
     public int heightClimbLimit;  // max height diff
 
-    [Header("Prefabs")]
-    public GameObject heroPrefab;
+    [Header("Prefab (Resources Path)")]
+    [Tooltip("Path under Resources to the hero prefab (e.g. \"Prefabs/HeroKnight\"). No extension.")]
+    public string heroPrefabPath;
+
+    /// <summary>
+    /// Loads the hero prefab from Resources at runtime.
+    /// </summary>
+    public GameObject Prefab
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(heroPrefabPath))
+                return null;
+            return Resources.Load<GameObject>(heroPrefabPath);
+        }
+    }
 }

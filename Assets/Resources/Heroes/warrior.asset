@@ -26,4 +26,4 @@ MonoBehaviour:
   energyRegenPerTurn: 0.1
   moveSpeed: 3
   heightClimbLimit: 2
-  heroPrefab: {fileID: 7050675380241107555, guid: d459093d5703eb445b9aeb16572a4fd4, type: 3}
+  heroPrefabPath: Prefabs/Warrior

@@ -9,35 +9,28 @@ public class GameplayInitializer : MonoBehaviour
 
     void Start()
     {
-        // Kick off the init in a coroutine so TetrisController.Start() runs first
+        // Run on next frame so TetrisController has set up its grid
         StartCoroutine(InitNextFrame());
     }
 
     private IEnumerator InitNextFrame()
     {
-        // wait one frame
         yield return null;
 
-        // 1) Validate the controller
         if (tetrisController == null)
         {
             Debug.LogError("GameplayInitializer: TetrisController is null!");
             yield break;
         }
 
-        // 2) Make sure grid dimensions are valid
         int gridW = tetrisController.GridWidth;
         int gridH = tetrisController.GridHeight;
         if (gridW <= 0 || gridH <= 0)
         {
-            Debug.LogError(
-                $"GameplayInitializer: Invalid grid size {gridW}×{gridH}. " +
-                "Ensure TetrisController sets GridWidth/GridHeight in Start()."
-            );
+            Debug.LogError($"GameplayInitializer: Invalid grid {gridW}×{gridH}");
             yield break;
         }
 
-        // 3) Get the selected hero config
         var pdm = PlayerDataManager.Instance;
         if (pdm == null)
         {
@@ -52,24 +45,26 @@ public class GameplayInitializer : MonoBehaviour
             yield break;
         }
 
-        // 4) Check the prefab
-        if (cfg.heroPrefab == null)
+        // **Use the new Prefab property**
+        var prefab = cfg.Prefab;
+        if (prefab == null)
         {
             Debug.LogError(
-                $"GameplayInitializer: Hero '{cfg.heroId}' has no heroPrefab assigned!"
+                $"GameplayInitializer: Hero '{cfg.heroId}' prefab not found.\n" +
+                $"Checked Resources at path '{cfg.heroPrefabPath}'."
             );
             yield break;
         }
 
-        // 5) Instantiate under the grid container
-        var heroGO = Instantiate(cfg.heroPrefab, tetrisController.gridContainer, false);
+        // Instantiate under the grid container
+        var heroGO = Instantiate(prefab, tetrisController.gridContainer, false);
 
-        // 6) Force bottom-left anchoring/pivot
+        // Force bottom-left anchoring/pivot
         var heroRT = heroGO.GetComponent<RectTransform>();
         heroRT.anchorMin = heroRT.anchorMax = Vector2.zero;
         heroRT.pivot = Vector2.zero;
 
-        // 7) Apply stats
+        // Fetch and configure the controller
         var heroCtrl = heroGO.GetComponent<HeroController>();
         if (heroCtrl == null)
         {
@@ -77,6 +72,7 @@ public class GameplayInitializer : MonoBehaviour
             yield break;
         }
 
+        // Apply stats from HeroAttributeData
         heroCtrl.maxHP = cfg.maxHP;
         heroCtrl.currentHP = cfg.maxHP;
         heroCtrl.damageType = cfg.damageType;
@@ -87,19 +83,23 @@ public class GameplayInitializer : MonoBehaviour
         heroCtrl.armor = cfg.armor;
         heroCtrl.maxEnergy = cfg.maxEnergy;
         heroCtrl.currentEnergy = cfg.maxEnergy;
-        heroCtrl.energyRegenPerTurn = cfg.energyRegenPerTurn;
+        heroCtrl.energyRegenPerTurn = (int)cfg.energyRegenPerTurn;
         heroCtrl.moveDistance = cfg.moveSpeed;
         heroCtrl.heightDiffLimit = cfg.heightClimbLimit;
 
-        // 8) Register with TetrisController
+        // Register with TetrisController
         tetrisController.RegisterHero(heroCtrl);
         heroCtrl.tetrisController = tetrisController;
 
-        // 9) Center in middle column
+        // Center in middle column
         int centerCol = Mathf.FloorToInt(gridW / 2f);
         heroCtrl.SetColumn(centerCol);
         heroCtrl.UpdatePosition();
 
         Debug.Log($"GameplayInitializer: Hero placed at column {centerCol} of {gridW}.");
+
+        var statsUI = Object.FindFirstObjectByType<HeroStatsUI>();
+        if (statsUI != null)
+            statsUI.hero = heroCtrl;
     }
 }

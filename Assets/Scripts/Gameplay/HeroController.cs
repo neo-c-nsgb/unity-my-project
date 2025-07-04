@@ -29,12 +29,14 @@ public class HeroController : MonoBehaviour
     public float critDamageBonus;
     [Range(0f, 1f)] public float dodgeChance;
     public int armor;
+    [HideInInspector] public int currentArmor;
+
 
     [Header("Resource")]
     public int maxEnergy;
-    [HideInInspector] public float currentEnergy;
+    [HideInInspector] public int currentEnergy;
     [Tooltip("Energy regenerated each turn")]
-    public float energyRegenPerTurn;
+    public int energyRegenPerTurn;
 
     [Header("Events")]
     [Tooltip("Fired when the hero is blocked on both sides and can't move")]
@@ -62,10 +64,12 @@ public class HeroController : MonoBehaviour
         // only use fallback startColumn if nothing set externally
         if (!columnSetExternally)
             currentColumn = Mathf.Clamp(startColumn, 0, tetrisController.GridWidth - 1);
-
         movingRight = startMovingRight;
+
+
         currentHP = maxHP;
-        currentEnergy = maxEnergy;
+        currentEnergy = 0;          // start at zero
+        currentArmor = armor;      // full armor
 
         UpdatePosition();
     }

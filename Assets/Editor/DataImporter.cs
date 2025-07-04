@@ -86,7 +86,7 @@ public static class DataImporter
         Debug.Log($"Imported {lines.Length - 1} monsters.");
     }
 
-    [MenuItem("Tools/Import Items from CSV")]
+    /*[MenuItem("Tools/Import Items from CSV")]
     public static void ImportItems()
     {
         string csvPath = "Assets/Resources/Data/Items.csv";
@@ -160,7 +160,7 @@ public static class DataImporter
             data.critDamageBonus = cd;
             data.itemPrefab = prefab;
             data.icon = icon;
-            data.shapeName = shape;
+            //data.shapeName = shape;
 
             if (!AssetDatabase.Contains(data))
                 AssetDatabase.CreateAsset(data, assetPath);
@@ -170,5 +170,5 @@ public static class DataImporter
 
         AssetDatabase.SaveAssets();
         Debug.Log($"Imported {lines.Length - 1} items.");
-    }
+    }*/
 }

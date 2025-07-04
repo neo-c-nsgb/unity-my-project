@@ -26,4 +26,4 @@ MonoBehaviour:
   energyRegenPerTurn: 0.2
   moveSpeed: 4
   heightClimbLimit: 3
-  heroPrefab: {fileID: 0}
+  heroPrefabPath: Prefabs/Archer

@@ -20,6 +20,10 @@ MonoBehaviour:
   dodgeChance: 0
   critChance: 0
   critDamageBonus: 0
-  itemPrefab: {fileID: 0}
-  icon: {fileID: 0}
-  shapeName: sword
+  prefabPath: Prefabs/Sword
+  iconPath: Sprites/Sword
+  gridSize: 5
+  cells:
+  - {x: 2, y: 3}
+  - {x: 2, y: 2}
+  - {x: 2, y: 1}
