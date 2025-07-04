@@ -29,6 +29,15 @@ public class TetrisController : MonoBehaviour
     public int GridHeight => rows;
 
     private HeroController hero;
+
+    /// <summary>
+    /// Call once to tell the controller which HeroController to use.
+    /// </summary>
+    public void RegisterHero(HeroController hc)
+    {
+        hero = hc;
+    }
+
     private UIBlock[,] grid;
     private List<Vector2Int> shapeCells;
     private List<UIBlock> shapeBlocks;
@@ -54,7 +63,7 @@ public class TetrisController : MonoBehaviour
 
         grid = new UIBlock[columns, rows];
 
-        if (heroPrefab != null)
+       /* if (heroPrefab != null)
         {
             var go = Instantiate(heroPrefab, gridContainer, false);
             hero = go.GetComponent<HeroController>();
@@ -62,7 +71,7 @@ public class TetrisController : MonoBehaviour
             hero.startColumn = columns / 2;
             hero.UpdatePosition();
         }
-
+       */
         StartCoroutine(GameLoop());
     }
 

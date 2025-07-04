@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eccbaf422cd8394ab7e9269dd55c981, type: 3}
+  m_Name: warrior
+  m_EditorClassIdentifier: 
+  heroId: warrior
+  heroName: warrior
+  portrait: {fileID: 0}
+  maxHP: 120
+  damageType: 0
+  baseDamage: 20
+  critChance: 0.1
+  critDamageBonus: 0.5
+  dodgeChance: 0.05
+  armor: 8
+  maxEnergy: 50
+  energyRegenPerTurn: 0.1
+  moveSpeed: 3
+  heightClimbLimit: 2
+  heroPrefab: {fileID: 7050675380241107555, guid: d459093d5703eb445b9aeb16572a4fd4, type: 3}
