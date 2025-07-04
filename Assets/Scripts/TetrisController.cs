@@ -18,6 +18,10 @@ public class TetrisController : MonoBehaviour
     public GameObject blockPrefab;
     public RectTransform heroPrefab;
 
+    [Header("Indicator")]
+    [Tooltip("Assign the TetrominoIndicator in the Inspector")]
+    public TetrominoIndicator indicator;
+
     private int columns, rows;
     public float CellSize { get; private set; }
 
@@ -32,6 +36,9 @@ public class TetrisController : MonoBehaviour
     private TetrominoData currentData;
     private bool shapeActive;
     private bool hasWon;
+
+    public List<Vector2Int> CurrentShapeCells => shapeCells;
+    public Vector2Int CurrentShapePos => shapePos;
 
     void Start()
     {
@@ -177,6 +184,12 @@ public class TetrisController : MonoBehaviour
                 (shapePos.y + c.y) * CellSize
             );
         }
+
+        // **Refresh the indicator** each time the shape moves or rotates
+        if (indicator != null)
+        {
+            indicator.UpdateIndicator();
+        }
     }
 
     private void TryMove(Vector2Int dir)
@@ -238,6 +251,10 @@ public class TetrisController : MonoBehaviour
             var c = shapeCells[i] + shapePos;
             grid[c.x, c.y] = shapeBlocks[i];
         }
+
+        // ★ Ensure the hero is always rendered above the newly-locked blocks
+        if (hero != null)
+            hero.GetComponent<RectTransform>().SetAsLastSibling();
     }
 
     private void ApplyGravityToAllColumns()

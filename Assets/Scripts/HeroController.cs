@@ -27,6 +27,8 @@ public class HeroController : MonoBehaviour
     private int currentColumn;
     private bool movingRight;
 
+    /// <summary> True if hero is currently moving/facing right </summary>
+    public bool FacingRight => movingRight;
 
     void Start()
     {
