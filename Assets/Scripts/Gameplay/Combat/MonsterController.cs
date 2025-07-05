@@ -1,92 +1,122 @@
-﻿// Assets/Scripts/MonsterController.cs
+﻿// Assets/Scripts/Gameplay/Combat/MonsterController.cs
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 [RequireComponent(typeof(RectTransform))]
 public class MonsterController : MonoBehaviour
 {
-    /// <summary>Data asset defining this monster’s stats & visual path.</summary>
     public MonsterData data { get; private set; }
-
-    /// <summary>Which column (0 = leftmost) this monster occupies.</summary>
     public int column { get; private set; }
+    public int currentHP { get; private set; }
 
-    RectTransform containerRT;
-    TetrisController tetris;
-    GameObject visualInstance;
+    private TetrisController tetris;
+    private RectTransform rt;
+
+    [Header("UI (wire these in your MonsterUIPrefab)")]
+    public TMP_Text damageText;      // e.g. "20"
+    public Image damageTypeIcon;  // melee/ranged
+    public Image hpBarImage;      // horizontal fillbar
+    public GameObject hpBarContainer;// parent of hpBarImage
+
+    // global icons
+    private Sprite meleeIcon;
+    private Sprite rangedIcon;
+    const string MeleeIconPath = "UI/Icons/MeleeIcon";
+    const string RangedIconPath = "UI/Icons/RangedIcon";
+
+    void Awake()
+    {
+        // preload your two damage-type icons
+        meleeIcon = Resources.Load<Sprite>(MeleeIconPath);
+        rangedIcon = Resources.Load<Sprite>(RangedIconPath);
+    }
 
     /// <summary>
-    /// Initialize the monster: position, parenting, visual, and draw order.
+    /// Must be called immediately after Instantiate() by MonsterManager.
     /// </summary>
     public void Initialize(MonsterData data, int col, TetrisController tetrisController)
     {
         this.data = data;
         this.column = col;
         this.tetris = tetrisController;
-        containerRT = GetComponent<RectTransform>();
+        this.rt = GetComponent<RectTransform>();
 
         float cell = tetris.CellSize;
 
-        // 1) Position container at bottom-left of its cell, above the top row
-        containerRT.anchorMin = containerRT.anchorMax = Vector2.zero;
-        containerRT.pivot = new Vector2(0f, 0f);
-        containerRT.anchoredPosition = new Vector2(col * cell, tetris.GridHeight * cell);
-
-        // 2) Parent under gridContainer
+        // — 1) Position the container —
+        rt.anchorMin = rt.anchorMax = Vector2.zero;
+        rt.pivot = Vector2.zero;
+        rt.anchoredPosition = new Vector2(col * cell, tetris.GridHeight * cell);
         transform.SetParent(tetris.gridContainer, false);
 
-        // 3) Instantiate the full-fidelity visual prefab as a child
-        var prefab = data.Prefab;
-        if (prefab == null)
+        // — 2) Spawn the “visual” prefab under this container —
+        var visPrefab = data.Prefab;
+        if (visPrefab == null)
         {
-            Debug.LogError($"MonsterController: prefab not found for '{data.monsterId}' at '{data.monsterPrefabPath}'");
-            return;
+            Debug.LogError(
+                $"[MonsterController] Couldn’t load visual prefab for '{data.monsterId}'.\n" +
+                $"  monsterPrefabPath = '{data.monsterPrefabPath}'\n" +
+                $"  Did you put the prefab under Resources/{data.monsterPrefabPath}.prefab?"
+            );
         }
-        visualInstance = Instantiate(prefab, transform, false);
-        var vRT = visualInstance.GetComponent<RectTransform>();
+        else
+        {
+            var go = Instantiate(visPrefab, transform, false);
+            var vRT = go.GetComponent<RectTransform>();
+            vRT.anchorMin = vRT.anchorMax = Vector2.zero;
+            vRT.pivot = new Vector2(0.5f, 0f);
+            vRT.sizeDelta = new Vector2(cell, cell);
+            vRT.anchoredPosition = new Vector2(cell * 0.5f, cell * 0.5f);
 
-        // 4) Align the child for center‐in‐cell and lift 0.5 cell up:
-        vRT.anchorMin = vRT.anchorMax = Vector2.zero;
-        vRT.pivot = new Vector2(0.5f, 0f);            // bottom-center pivot
-        vRT.sizeDelta = new Vector2(cell, cell);          // one cell size
-        vRT.anchoredPosition = new Vector2(cell * 0.5f, cell * 0.5f);
+            // ensure this visual sits _behind_ your stats UI:
+            go.transform.SetAsFirstSibling();
+        }
 
-        // 5) Reorder siblings: monster under hero, above all blocks
-        var heroRT = tetris.Hero.GetComponent<RectTransform>();
-        // a) bring hero to the very top
-        heroRT.SetAsLastSibling();
-        // b) place monster just below hero
-        containerRT.SetSiblingIndex(heroRT.GetSiblingIndex() - 1);
+        // — 3) Initialize HP + damage UI —
+        currentHP = data.maxHP;
+        damageText.text = data.damage.ToString();
+        if (damageTypeIcon != null)
+        {
+            damageTypeIcon.sprite = (data.damageType == DamageType.Melee)
+                ? meleeIcon
+                : rangedIcon;
+        }
 
-        // 6) Initial facing
-        UpdateFacing();
+        UpdateHPBar();
     }
 
-    /// <summary>
-    /// Called each gravity pass; drops the container down onto the settled blocks.
-    /// </summary>
+    /// <summary>Apply damage, refresh the HP bar, and remove if dead.</summary>
+    public void ApplyDamage(int amount)
+    {
+        currentHP = Mathf.Clamp(currentHP - amount, 0, data.maxHP);
+        UpdateHPBar();
+        if (currentHP == 0)
+            tetris.monsterManager.RemoveMonster(this);
+    }
+
+    private void UpdateHPBar()
+    {
+        if (hpBarImage != null)
+            hpBarImage.fillAmount = (float)currentHP / data.maxHP;
+
+        if (hpBarContainer != null)
+        {
+            bool visible = currentHP > 0 && currentHP < data.maxHP;
+            hpBarContainer.SetActive(visible);
+        }
+    }
+
+    /// <summary>Called each turn to drop this monster onto the stack.</summary>
     public void ApplyGravity()
     {
         float cell = tetris.CellSize;
         int height = tetris.GetColumnHeight(column);
-        containerRT.anchoredPosition = new Vector2(column * cell, height * cell);
+        rt.anchoredPosition = new Vector2(column * cell, height * cell);
     }
 
     void LateUpdate()
     {
-        UpdateFacing();
-    }
-
-    /// <summary>
-    /// Flips the visual child around its bottom-center pivot to face the hero.
-    /// </summary>
-    void UpdateFacing()
-    {
-        if (visualInstance == null || tetris.Hero == null) return;
-
-        bool faceRight = tetris.Hero.CurrentColumn > column;
-        var vRT = visualInstance.GetComponent<RectTransform>();
-        var s = vRT.localScale;
-        s.x = Mathf.Abs(s.x) * (faceRight ? 1f : -1f);
-        vRT.localScale = s;
+        // Optionally flip any visual you spawned here
     }
 }

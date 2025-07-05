@@ -1,12 +1,14 @@
-﻿// Assets/Scripts/MonsterManager.cs
-using System.Linq;
-using System.Collections.Generic;
+﻿// Assets/Scripts/Gameplay/Combat/MonsterManager.cs
 using UnityEngine;
+using System.Collections.Generic;
 
 public class MonsterManager : MonoBehaviour
 {
     [Tooltip("Drag your TetrisController here")]
     public TetrisController tetrisController;
+
+    [Tooltip("Your fully‐setup MonsterUI prefab")]
+    public GameObject monsterUIPrefab;
 
     private MonsterData[] allMonsters;
     private MonsterData[] pool;
@@ -14,103 +16,103 @@ public class MonsterManager : MonoBehaviour
 
     void Start()
     {
-        // Load all MonsterData assets from Resources/Monsters/
+        // Load & filter based on level
         allMonsters = Resources.LoadAll<MonsterData>("Monsters");
         RefreshPool();
     }
 
-    /// <summary>
-    /// Rebuilds the pool of spawnable monsters based on current level difficulty.
-    /// </summary>
     public void RefreshPool()
     {
+        List<MonsterData> temp = new List<MonsterData>();
         int lvl = GameManager.Instance.levelDifficulty;
-        pool = allMonsters
-            .Where(m => m.difficulty <= lvl)
-            .ToArray();
+        foreach (var m in allMonsters)
+            if (m.difficulty <= lvl)
+                temp.Add(m);
+        pool = temp.ToArray();
     }
 
     /// <summary>
-    /// Called once per turn (after hero.MoveTurn()).
-    /// Handles spawning new monsters, applying gravity, and maintaining draw order.
+    /// Call each turn (after hero.MoveTurn()).
+    /// Spawns, drops, and re-layers monsters.
     /// </summary>
     public void HandleTurn()
     {
         var gm = GameManager.Instance;
 
-        // 1) Spawn a new monster if under cap and random check passes
+        // Maybe spawn
         if (active.Count < gm.MaxMonstersInPlay
             && Random.value < gm.MonsterSpawnChance)
         {
             SpawnMonster();
         }
 
-        // 2) Apply gravity (drop) to all active monsters
+        // Gravity
         foreach (var m in active)
             m.ApplyGravity();
 
-        // 3) Reorder draw layers: monsters above blocks...
+        // Draw order: monsters above blocks
         foreach (var m in active)
-        {
-            var rt = m.GetComponent<RectTransform>();
-            rt.SetAsLastSibling();
-        }
-        // ...and hero above all monsters
-        var heroRT = tetrisController.Hero.GetComponent<RectTransform>();
-        heroRT.SetAsLastSibling();
+            m.GetComponent<RectTransform>().SetAsLastSibling();
+        // Hero on top
+        tetrisController.Hero
+            .GetComponent<RectTransform>()
+            .SetAsLastSibling();
     }
 
-    /// <summary>
-    /// Instantiates a new monster container + visual in a random open column.
-    /// </summary>
     private void SpawnMonster()
     {
-        if (pool.Length == 0) return;
+        if (pool == null || pool.Length == 0) return;
 
-        // Pick a random MonsterData from the pool
-        var data = pool[Random.Range(0, pool.Length)];
+        // Pick random data
+        int idx = Random.Range(0, pool.Length);
+        MonsterData data = pool[idx];
 
-        // Determine columns not occupied by the hero or another monster
+        // Find open columns
         int heroCol = tetrisController.Hero.CurrentColumn;
-        var openCols = Enumerable.Range(0, tetrisController.GridWidth)
-            .Where(c => c != heroCol && active.All(m => m.column != c))
-            .ToArray();
-        if (openCols.Length == 0) return;
+        List<int> openCols = new List<int>();
+        for (int c = 0; c < tetrisController.GridWidth; c++)
+        {
+            if (c == heroCol) continue;
+            bool occupied = false;
+            foreach (var m in active)
+                if (m.column == c) { occupied = true; break; }
+            if (!occupied) openCols.Add(c);
+        }
+        if (openCols.Count == 0) return;
 
-        int col = openCols[Random.Range(0, openCols.Length)];
+        int col = openCols[Random.Range(0, openCols.Count)];
 
-        // Create a new GameObject with RectTransform + MonsterController
-        var go = new GameObject($"Monster_{data.monsterId}",
-                                typeof(RectTransform),
-                                typeof(MonsterController));
-        go.transform.SetParent(tetrisController.gridContainer, false);
-
-        // Initialize it
+        // Instantiate your prefab (with all UI children already wired)
+        var go = Instantiate(monsterUIPrefab,
+                             tetrisController.gridContainer,
+                             false);
         var mc = go.GetComponent<MonsterController>();
         mc.Initialize(data, col, tetrisController);
         active.Add(mc);
     }
 
     /// <summary>
-    /// Call to remove (and destroy) a monster when it’s killed or leaves play.
+    /// Instantly kills monsters in the dropped columns.
     /// </summary>
+    public void KillMonstersInColumns(int[] columns)
+    {
+        List<MonsterController> toKill = new List<MonsterController>();
+        foreach (var m in active)
+        {
+            foreach (var c in columns)
+                if (m.column == c)
+                {
+                    toKill.Add(m);
+                    break;
+                }
+        }
+        foreach (var m in toKill)
+            RemoveMonster(m);
+    }
+
     public void RemoveMonster(MonsterController mc)
     {
         if (active.Remove(mc))
             Destroy(mc.gameObject);
-    }
-
-    /// <summary>
-    /// Kills (removes) all active monsters whose column is in the given set.
-    /// </summary>
-    public void KillMonstersInColumns(IEnumerable<int> columns)
-    {
-        // Find all monsters matching any of the columns
-        var toKill = active
-          .Where(m => columns.Contains(m.column))
-          .ToList(); // materialize to avoid modifying while iterating
-
-        foreach (var m in toKill)
-            RemoveMonster(m);
     }
 }

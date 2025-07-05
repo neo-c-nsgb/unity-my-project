@@ -122,10 +122,13 @@ public class TetrisController : MonoBehaviour
             if (monsterManager != null)
             {
                 // collect the absolute columns this shape covers
-                var shapeCols = shapeCells
-                    .Select(c => shapePos.x + c.x)
-                    .Distinct();
-                monsterManager.KillMonstersInColumns(shapeCols);
+                var shapeCols = new List<int>();
+                foreach (var c in shapeCells)
+                    shapeCols.Add(shapePos.x + c.x);
+
+                // distinctify and convert to array
+                int[] cols = shapeCols.Distinct().ToArray();
+                monsterManager.KillMonstersInColumns(cols);
             }
 
             // --- Crush Check ---
@@ -223,7 +226,10 @@ public class TetrisController : MonoBehaviour
         // **Refresh the indicator** each time the shape moves or rotates
         if (indicator != null)
         {
-            indicator.UpdateIndicator();
+            var cols = shapeCells
+                .Select(c => shapePos.x + c.x)
+                .Distinct();
+            indicator.UpdateIndicator(cols);
         }
     }
 

@@ -29,6 +29,8 @@ public class MonsterData : ScriptableObject
     [Tooltip("Path under Resources to the monster’s full prefab (e.g. \"Prefabs/Monsters/Goblin\"). No extension.")]
     public string monsterPrefabPath;
 
+
+
     /// <summary>
     /// Loads the monster’s visual prefab via Resources.Load.
     /// </summary>

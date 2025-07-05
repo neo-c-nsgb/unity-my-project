@@ -1,89 +1,64 @@
 // Assets/Scripts/TetrominoIndicator.cs
-using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
 public class TetrominoIndicator : MonoBehaviour
 {
-    [Tooltip("Reference to your TetrisController (auto-find if left null)")]
-    public TetrisController controller;
-    [Tooltip("Prefab: a simple Image with no child, anchored (0,0) pivot (0,0)")]
-    public Image markerPrefab;
-    public float markerHeight = 15f;
+    [Tooltip("The RectTransform of your Tetris grid; used for sizing.")]
+    public RectTransform gridContainer;
 
-    private Image[] markers;
-    private RectTransform rt;
-    private bool initialized = false;
+    [Tooltip("A thin UI Image prefab to mark each column.")]
+    public RectTransform markerPrefab;
+
+    // internally tracked markers
+    private readonly List<RectTransform> markers = new List<RectTransform>();
+
+    private TetrisController tetris;
 
     void Awake()
     {
-        rt = GetComponent<RectTransform>();
-        // auto-find controller if not set
-        if (controller == null)
-        {
-            controller = Object.FindFirstObjectByType<TetrisController>();
-            if (controller == null)
-                Debug.LogError("[Indicator] No TetrisController found on scene!");
-        }
+        tetris = Object.FindFirstObjectByType<TetrisController>();
+        if (tetris == null)
+            Debug.LogError("[Indicator] No TetrisController found.");
+
+        if (gridContainer == null)
+            Debug.LogError("[Indicator] gridContainer not assigned!");
+
+        if (markerPrefab == null)
+            Debug.LogError("[Indicator] markerPrefab not assigned!");
     }
 
     /// <summary>
-    /// Creates marker pool based on current grid width.
+    /// Call whenever you need to redraw the landing indicator.
     /// </summary>
-    private void InitMarkers()
+    /// <param name="shapeColumns">Absolute columns the current shape covers</param>
+    public void UpdateIndicator(IEnumerable<int> shapeColumns)
     {
-        int maxColumns = (controller != null) ? controller.GridWidth : 0;
-        markers = new Image[maxColumns];
-        for (int i = 0; i < maxColumns; i++)
+        // 1) Recompute sizes now that gridContainer has been laid out
+        float cellSize = tetris.CellSize;
+        float gridHeightPx = gridContainer.rect.height;
+
+        // 2) Clear any old markers
+        foreach (var m in markers)
+            if (m != null) Destroy(m.gameObject);
+        markers.Clear();
+
+        // 3) Instantiate new markers under THIS panel
+        foreach (var col in shapeColumns)
         {
-            var m = Instantiate(markerPrefab, rt, false);
-            m.gameObject.SetActive(false);
-            markers[i] = m;
-        }
-        initialized = true;
-    }
+            var m = Instantiate(markerPrefab, transform, false);
+            m.gameObject.SetActive(true);
 
-    /// <summary>
-    /// Call this any time the piece moves or rotates.
-    /// </summary>
-    public void UpdateIndicator()
-    {
-        if (controller == null) return;
-        if (!initialized) InitMarkers();
+            // anchor bottom-left
+            m.anchorMin = m.anchorMax = Vector2.zero;
+            m.pivot = Vector2.zero;
 
-        // get distinct occupied columns
-        var cells = controller.CurrentShapeCells;
-        var pos = controller.CurrentShapePos;
-        float size = controller.CellSize;
+            // size = one column wide, full grid height
+            m.sizeDelta = new Vector2(cellSize, gridHeightPx);
+            m.anchoredPosition = new Vector2(col * cellSize, 0f);
 
-        var xs = cells
-            .Select(c => c.x + pos.x)
-            .Distinct()
-            .OrderBy(x => x)
-            .ToArray();
-
-
-
-        for (int i = 0; i < markers.Length; i++)
-        {
-            if (i < xs.Length)
-            {
-                int col = xs[i];
-                var m = markers[i];
-                m.gameObject.SetActive(true);
-                var mRT = m.rectTransform;
-                mRT.anchorMin = mRT.anchorMax = new Vector2(0, 0);
-                mRT.pivot = new Vector2(0, 0);
-                mRT.anchoredPosition = new Vector2(col * size, 0);
-                mRT.sizeDelta = new Vector2(size, size * markerHeight);
-
-
-            }
-            else
-            {
-                markers[i].gameObject.SetActive(false);
-            }
+            markers.Add(m);
         }
     }
 }
