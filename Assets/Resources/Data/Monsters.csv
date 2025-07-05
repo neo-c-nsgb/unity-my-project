@@ -1,3 +1,5 @@
-monsterId,monsterName,maxHP,damage,damageType,dodgeChance,critChance,critDamageBonus,prefabPath,difficulty
-goblin,Goblin,50,10,Melee,0.1,0.05,0.5,Prefabs/Goblin,1
-drake,Drake,20,20,Ranged,0.2,0.15,1,Prefabs/Drake,2
+monsterId,monsterName,maxHP,damage,damageType,dodgeChance,critChance,critDamageBonus,monsterPrefabPath,difficulty
+M_01,Green Slime,50,10,Melee,0.1,0.05,0.5,Prefabs/Monsters/01_GreenSlime,1
+M_02,Shaman,20,20,Melee,0.2,0.15,1,Prefabs/Monsters/02_Shaman,2
+M_03,GuitarMan,50,10,Ranged,0.1,0.05,0.5,Prefabs/Monsters/03_GuitarMan,1
+M_04,YellowDrake,20,20,Ranged,0.2,0.15,1,Prefabs/Monsters/04_YellowDrake,2

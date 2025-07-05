@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4eccbaf422cd8394ab7e9269dd55c981, type: 3}
-  m_Name: warrior
+  m_Name: H_01
   m_EditorClassIdentifier: 
-  heroId: warrior
-  heroName: warrior
+  heroId: H_01
+  heroName: Knight
   portrait: {fileID: 0}
   maxHP: 120
   damageType: 0
@@ -26,4 +26,4 @@ MonoBehaviour:
   energyRegenPerTurn: 0.1
   moveSpeed: 3
   heightClimbLimit: 2
-  heroPrefabPath: Prefabs/Warrior
+  heroPrefabPath: Prefabs/Heroes/01_Knight

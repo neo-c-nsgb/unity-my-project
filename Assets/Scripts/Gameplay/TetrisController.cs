@@ -1,6 +1,7 @@
 ﻿// Assets/Scripts/TetrisController.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,11 +17,13 @@ public class TetrisController : MonoBehaviour
 
     [Header("Prefabs")]
     public GameObject blockPrefab;
-    public RectTransform heroPrefab;
+    //public RectTransform heroPrefab;
 
     [Header("Indicator")]
     [Tooltip("Assign the TetrominoIndicator in the Inspector")]
     public TetrominoIndicator indicator;
+
+
 
     private int columns, rows;
     public float CellSize { get; private set; }
@@ -29,6 +32,13 @@ public class TetrisController : MonoBehaviour
     public int GridHeight => rows;
 
     private HeroController hero;
+
+    /// <summary>
+    /// Exposes the current HeroController for other systems.
+    /// </summary>
+    public HeroController Hero => hero;
+
+    public MonsterManager monsterManager;
 
     /// <summary>
     /// Call once to tell the controller which HeroController to use.
@@ -109,6 +119,15 @@ public class TetrisController : MonoBehaviour
             LockShape();
             shapeActive = false;
 
+            if (monsterManager != null)
+            {
+                // collect the absolute columns this shape covers
+                var shapeCols = shapeCells
+                    .Select(c => shapePos.x + c.x)
+                    .Distinct();
+                monsterManager.KillMonstersInColumns(shapeCols);
+            }
+
             // --- Crush Check ---
             if (hero != null)
             {
@@ -149,8 +168,15 @@ public class TetrisController : MonoBehaviour
             if (hasWon) yield break;
 
             hero?.MoveTurn();
+
+            if (monsterManager != null)
+                monsterManager.HandleTurn();
+
             if (CheckGameOver()) yield break;
         }
+
+
+
     }
 
     private void SpawnShapeFromData()

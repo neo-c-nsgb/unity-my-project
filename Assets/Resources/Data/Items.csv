@@ -1,3 +1,0 @@
-monsterId,monsterName,hpBonus,damageBonus,armorBonus,dodgeChance,critChance,critDamageBonus,prefabPath,spritePath,shapeName
-sword,Iron Sword,0,1,0,0,0,0,Prefabs/Sword,Sprites/Sword,sword
-shield,Wooden Shield,0,0,1,0,0,0,Prefabs/Shield,Sprites/Shield,shield

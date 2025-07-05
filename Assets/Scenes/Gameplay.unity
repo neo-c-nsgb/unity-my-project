@@ -685,6 +685,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 202099225}
   m_CullTransparentMesh: 1
+--- !u!1 &333224025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 333224027}
+  - component: {fileID: 333224026}
+  m_Layer: 0
+  m_Name: MonsterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &333224026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333224025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9435ea23324d61a4f9e010ddcbf041d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tetrisController: {fileID: 1698061118}
+--- !u!224 &333224027
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333224025}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 563.5656, y: 273.47958}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &336856059
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,10 +922,14 @@ MonoBehaviour:
     gridWidth: 8
     gridHeight: 16
     winRowCount: 10
+    monsterSpawnChance: 1
+    maxMonstersInPlay: 4
   - difficulty: 2
     gridWidth: 10
     gridHeight: 20
     winRowCount: 20
+    monsterSpawnChance: 1
+    maxMonstersInPlay: 2
 --- !u!4 &467593237
 Transform:
   m_ObjectHideFlags: 0
@@ -3404,8 +3457,8 @@ MonoBehaviour:
   clearDelay: 0.1
   library: {fileID: 877053571}
   blockPrefab: {fileID: 9178297832521780081, guid: 0e5cc77e08bd607488ddceacefe5c8fa, type: 3}
-  heroPrefab: {fileID: 9029148799401240962, guid: d459093d5703eb445b9aeb16572a4fd4, type: 3}
   indicator: {fileID: 1991212314}
+  monsterManager: {fileID: 333224026}
 --- !u!4 &1698061119
 Transform:
   m_ObjectHideFlags: 0
@@ -3761,8 +3814,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allHeroes:
-  - {fileID: 11400000, guid: 0df6eb6e422ca4044a7b52bf5fc0c2be, type: 2}
-  selectedHeroId: warrior
+  - {fileID: 11400000, guid: 2f91f668562884240ba5884d3dbc9c09, type: 2}
+  selectedHeroId: H_01
 --- !u!4 &1893243876
 Transform:
   m_ObjectHideFlags: 0
@@ -3841,3 +3894,4 @@ SceneRoots:
   - {fileID: 877053572}
   - {fileID: 467593237}
   - {fileID: 1893243876}
+  - {fileID: 333224027}

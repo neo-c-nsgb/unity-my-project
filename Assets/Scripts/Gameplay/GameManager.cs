@@ -11,6 +11,11 @@ public class LevelConfig
     [Tooltip("Columns for this tier")] public int gridWidth;
     [Tooltip("Rows for this tier")] public int gridHeight;
     [Tooltip("Rows to clear to win")] public int winRowCount;
+
+    [Header("Monsters")]
+    [Range(0f, 1f)]
+    public float monsterSpawnChance;   // e.g. 0.3 = 30% per turn
+    public int maxMonstersInPlay;    // cap on simultaneous monsters
 }
 
 public class GameManager : MonoBehaviour
@@ -49,6 +54,8 @@ public class GameManager : MonoBehaviour
     public int GridHeight => currentConfig.gridHeight;
     public int WinRowCount => currentConfig.winRowCount;
     public int RowsCleared => rowsCleared;
+    public float MonsterSpawnChance => currentConfig.monsterSpawnChance;
+    public int MaxMonstersInPlay => currentConfig.maxMonstersInPlay;
 
     public void AddClearedRows(int count)
     {

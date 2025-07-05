@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf9b6873d6f157d47bc8e69f891d5d20, type: 3}
-  m_Name: goblin
+  m_Name: M_03
   m_EditorClassIdentifier: 
-  monsterId: goblin
-  monsterName: Goblin
+  monsterId: M_03
+  monsterName: GuitarMan
+  difficulty: 1
+  maxSimultaneous: 0
   maxHP: 50
   damage: 10
-  damageType: 0
+  damageType: 1
   dodgeChance: 0.1
   critChance: 0.05
   critDamageBonus: 0.5
-  monsterPrefab: {fileID: 0}
-  difficulty: 1
+  monsterPrefabPath: Prefabs/Monsters/03_GuitarMan
