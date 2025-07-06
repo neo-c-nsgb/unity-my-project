@@ -25,9 +25,15 @@ public class HeroStatsUI : MonoBehaviour
         }
 
         // Once hero is non-null, update every frame
-        hpText.text = $"HP: {hero.currentHP}/{hero.maxHP}";
+        /*hpText.text = $"HP: {hero.currentHP}/{hero.maxHP}";
         armorText.text = $"Armor: {hero.currentArmor}/{hero.armor}";
         energyText.text = $"Energy: {hero.currentEnergy}/{hero.maxEnergy}";
-        moveText.text = $"Speed: {hero.moveDistance}";
+        moveText.text = $"Speed: {hero.moveDistance}";*/
+
+        hpText.text = $"{hero.currentHP}/{hero.maxHP}";
+        armorText.text = $"{hero.currentArmor}";
+        moveText.text = $"{hero.moveDistance}"; 
+
+
     }
 }

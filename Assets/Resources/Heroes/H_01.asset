@@ -25,5 +25,5 @@ MonoBehaviour:
   maxEnergy: 50
   energyRegenPerTurn: 0.1
   moveSpeed: 3
-  heightClimbLimit: 2
+  heightClimbLimit: 5
   heroPrefabPath: Prefabs/Heroes/01_Knight
